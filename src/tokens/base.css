@@ -1,4 +1,6 @@
-:root[data-pims-ui="glass"] body { background: var(--pims-bg-image), var(--pims-bg-base); background-attachment: fixed; color: var(--pims-ink); font-family: var(--pims-font); }
-:root[data-pims-ui="glass"] :focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--pims-focus-ring); }
-:root[data-pims-ui="glass"] button:not(:disabled):active { transform: scale(var(--pims-press-scale)); transition: transform var(--pims-dur) ease; }
-@media print { :root[data-pims-ui="glass"] body { background: #fff; color: #000; } }
+/* Screen-only: print gets none of this, so it falls back to the app's classic styles. */
+@media screen {
+  :root[data-pims-ui="glass"] body { background: var(--pims-bg-image), var(--pims-bg-base); background-attachment: fixed; color: var(--pims-ink); font-family: var(--pims-font); }
+  :root[data-pims-ui="glass"] :focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--pims-focus-ring); }
+  :root[data-pims-ui="glass"] button:not(:disabled):active { transform: scale(var(--pims-press-scale)); transition: transform var(--pims-dur) ease; }
+}

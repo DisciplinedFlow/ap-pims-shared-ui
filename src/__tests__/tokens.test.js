@@ -54,6 +54,19 @@ const field = { ...light, ...fieldOnly }
 const parseColourLoose = (v) => /^#[0-9a-f]{6}$/i.test(v)
 const isColour = (v) => /^(#|rgba?\()/.test(v)
 
+describe('base.css print', () => {
+  const rules = parseRules(files['base.css'])
+  it('has no rule that applies in print', () => {
+    expect(rules.length).toBeGreaterThan(0)
+    for (const r of rules) expect(r.media && r.media.startsWith('@media screen'), r.selectors[0]).toBe(true)
+    expect(files['base.css']).not.toMatch(/@media[^{]*print/)
+  })
+  it('declares no colour literal outside @media screen', () => {
+    const outside = files['base.css'].replace(/@media screen\s*\{[\s\S]*\}\s*$/, '')
+    expect(outside).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(|\b(white|black)\b/i)
+  })
+})
+
 describe('print', () => {
   it('tokens.css defines no --pims- token outside @media screen (print gets classic fallbacks)', () => {
     for (const r of blocks) {
