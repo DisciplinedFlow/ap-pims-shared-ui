@@ -5,20 +5,22 @@
   :root[data-pims-ui="glass"] {
     color-scheme: light;
     --pims-font: Inter, -apple-system, "Segoe UI", system-ui, sans-serif;
-    --pims-bg-base: #f3f5f9;
-    --pims-bg-image: radial-gradient(1200px 500px at 10% -10%, #dbeafe 0, transparent 60%), radial-gradient(900px 500px at 100% 0, #e0f2f1 0, transparent 55%);
-    --pims-bar: rgba(255,255,255,.6);
-    --pims-side: rgba(255,255,255,.35);
-    --pims-surface: rgba(255,255,255,.78);
+    --pims-bg-base: #eef2f8;
+    --pims-bg-image: radial-gradient(1200px 520px at 10% -10%, #cfe0fa 0, transparent 62%), radial-gradient(900px 520px at 100% 0, #cfe9e5 0, transparent 58%);
+    --pims-bar: rgba(255,255,255,.82);
+    --pims-side: rgba(255,255,255,.55);
+    --pims-surface: rgba(255,255,255,.70);
     --pims-surface-solid: #ffffff;
     --pims-field: rgba(255,255,255,.7);
     --pims-sel: rgba(255,255,255,.9);
     --pims-hover: rgba(255,255,255,.55);
     --pims-ink: #111827;
     --pims-text-2: #4b5563;
-    --pims-text-3: #68707d;
+    --pims-text-3: #596170;
     --pims-line: rgba(17,24,39,.08);
     --pims-line-2: rgba(17,24,39,.12);
+    --pims-field-border: #78828f;
+    --pims-card-border: rgba(255,255,255,.7);
     --pims-accent: #1667e0;
     --pims-accent-ink: #0b52bf;
     --pims-primary-from: #1667e0;
@@ -27,7 +29,7 @@
     --pims-on-primary: #ffffff;
     --pims-primary-shadow: 0 6px 16px -6px rgba(11,82,191,.55), inset 0 1px 0 rgba(255,255,255,.3);
     --pims-secondary-shadow: 0 1px 2px rgba(17,24,39,.06);
-    --pims-card-shadow: 0 1px 1px rgba(17,24,39,.04), 0 8px 24px -12px rgba(17,24,39,.18);
+    --pims-card-shadow: 0 1px 1px rgba(17,24,39,.06), 0 10px 28px -12px rgba(17,24,39,.30);
     --pims-chip-on: #111827;
     --pims-chip-on-ink: #ffffff;
     --pims-info: #0b52bf;   --pims-info-soft: rgba(22,103,224,.12);
@@ -36,7 +38,7 @@
     --pims-ok: #0f6e3c;     --pims-ok-soft: rgba(16,185,129,.14);
     --pims-r-btn: 999px; --pims-r-chip: 999px; --pims-r-field: 10px; --pims-r-card: 16px; --pims-r-row: 10px;
     --pims-h-btn: 36px; --pims-h-field: 36px; --pims-pad-btn: 0 16px;
-    --pims-blur: blur(18px) saturate(1.4);
+    --pims-blur: blur(18px) saturate(1.15);
     --pims-focus-ring: 0 0 0 3px rgba(22,103,224,.35);
     --pims-press-scale: .97;
     --pims-dur: 150ms;
@@ -45,8 +47,8 @@
     color-scheme: dark;
     --pims-bg-base: #0a0d14;
     --pims-bg-image: radial-gradient(1200px 500px at 10% -10%, #1e293b 0, transparent 60%), radial-gradient(900px 500px at 100% 0, #0f3a3d 0, transparent 55%);
-    --pims-bar: rgba(20,24,33,.6);
-    --pims-side: rgba(20,24,33,.35);
+    --pims-bar: rgba(20,24,33,.80);
+    --pims-side: rgba(20,24,33,.55);
     --pims-surface: rgba(28,32,43,.72);
     --pims-surface-solid: #161a23;
     --pims-field: rgba(28,32,43,.7);
@@ -57,6 +59,8 @@
     --pims-text-3: #9098a6;
     --pims-line: rgba(255,255,255,.07);
     --pims-line-2: rgba(255,255,255,.12);
+    --pims-field-border: #667184;
+    --pims-card-border: rgba(255,255,255,.08);
     --pims-accent: #3b8bff;
     --pims-accent-ink: #8ab8ff;
     --pims-primary-from: #2770e6;
@@ -80,7 +84,7 @@
     --pims-bg-image: none;
     --pims-bar: #ffffff; --pims-side: #ffffff; --pims-surface: #ffffff; --pims-field: #ffffff;
     --pims-ink: #0b1220; --pims-text-2: #334155; --pims-text-3: #475569;
-    --pims-line: #d5dce4; --pims-line-2: #c3ccd7;
+    --pims-line: #d5dce4; --pims-line-2: #c3ccd7; --pims-field-border: #64748b; --pims-card-border: #d5dce4;
     --pims-blur: none;
     --pims-card-shadow: 0 1px 0 #d5dce4;
   }

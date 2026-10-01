@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" data-pims-ui="glass" data-pims-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soft glass demo</title>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../tokens/base.css">
+<style>
+  /* Demo layout only; every colour, radius and shadow comes from --pims-* tokens. */
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 0 0 84px; font-size: 14px; }
+  .bar { position: sticky; top: 0; z-index: 2; display: flex; gap: 12px; align-items: center; padding: 10px 20px; background: var(--pims-bar); backdrop-filter: var(--pims-blur); -webkit-backdrop-filter: var(--pims-blur); border-bottom: 1px solid var(--pims-line); }
+  .main { max-width: 1100px; margin: 0 auto; padding: 20px; display: grid; gap: 16px; }
+  h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+  p { margin: 4px 0 0; color: var(--pims-text-2); }
+  .card { background: var(--pims-surface); border: 1px solid var(--pims-card-border); outline: 1px solid var(--pims-line); outline-offset: -1px; border-radius: var(--pims-r-card); box-shadow: var(--pims-card-shadow); backdrop-filter: var(--pims-blur); -webkit-backdrop-filter: var(--pims-blur); padding: 16px; display: grid; gap: 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .btn { display: inline-flex; align-items: center; height: var(--pims-h-btn); padding: var(--pims-pad-btn); border-radius: var(--pims-r-btn); border: 1px solid transparent; font: 600 13px var(--pims-font); cursor: pointer; }
+  .pri { background: var(--pims-primary); color: var(--pims-on-primary); box-shadow: var(--pims-primary-shadow); }
+  .sec { background: var(--pims-surface); color: var(--pims-ink); border-color: var(--pims-field-border); box-shadow: var(--pims-secondary-shadow); }
+  input { height: var(--pims-h-field); padding: 0 12px; border-radius: var(--pims-r-field); border: 1px solid var(--pims-field-border); background: var(--pims-field); color: var(--pims-ink); font: 14px var(--pims-font); min-width: 220px; }
+  input::placeholder { color: var(--pims-text-3); }
+  .tabs { display: flex; gap: 6px; }
+  .tab { padding: 7px 14px; border-radius: var(--pims-r-chip); color: var(--pims-text-2); font-weight: 600; }
+  .tab.on { background: var(--pims-sel); color: var(--pims-ink); box-shadow: var(--pims-secondary-shadow); }
+  .chip { padding: 5px 12px; border-radius: var(--pims-r-chip); border: 1px solid var(--pims-field-border); background: var(--pims-field); color: var(--pims-text-2); font-size: 12px; font-weight: 600; }
+  .chip.on { background: var(--pims-chip-on); color: var(--pims-chip-on-ink); border-color: transparent; }
+  .pill { padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .info { background: var(--pims-info-soft); color: var(--pims-info); } .warn { background: var(--pims-warn-soft); color: var(--pims-warn); }
+  .danger { background: var(--pims-danger-soft); color: var(--pims-danger); } .ok { background: var(--pims-ok-soft); color: var(--pims-ok); }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 12px; color: var(--pims-text-3); font-weight: 600; padding: 8px 10px; }
+  td { padding: 10px; border-top: 1px solid var(--pims-line); color: var(--pims-ink); }
+  td.m { color: var(--pims-text-2); } tr.sel td { background: var(--pims-sel); }
+  .blob { position: absolute; top: 20px; left: 30%; width: 360px; height: 160px; background: #1677ff; border-radius: 50%; z-index: 0; opacity: .85; }
+  .bottom { position: fixed; left: 0; right: 0; bottom: 0; z-index: 3; display: flex; justify-content: space-around; padding: 12px; background: var(--pims-bar); backdrop-filter: var(--pims-blur); -webkit-backdrop-filter: var(--pims-blur); border-top: 1px solid var(--pims-line); color: var(--pims-text-2); font-weight: 600; }
+  .main { position: relative; z-index: 1; }
+</style>
+</head>
+<body>
+<div class="bar"><b>AP</b> <span style="color:var(--pims-text-2)">Arts District / RFI Log</span><span style="flex:1"></span><input placeholder="Search RFIs" aria-label="Search"></div>
+<div class="blob" aria-hidden="true"></div>
+<div class="main">
+  <div><h1>RFI Log</h1><p>Soft glass demo built only from tokens.</p></div>
+  <div class="card">
+    <div class="tabs"><span class="tab on">Open</span><span class="tab">Answered</span><span class="tab">Closed</span></div>
+    <div class="row"><button class="btn pri">Create RFI</button><button class="btn sec">Export</button><input placeholder="Filter by sheet" aria-label="Filter"></div>
+    <div class="row"><span class="chip on">All</span><span class="chip">Structural</span><span class="chip">MEP</span><span class="chip">Architectural</span></div>
+    <div class="row"><span class="pill info">Info</span><span class="pill warn">Pending</span><span class="pill danger">Overdue</span><span class="pill ok">Answered</span></div>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th>RFI</th><th>Subject</th><th>Due</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr class="sel"><td>RFI-014</td><td>Slab edge at grid C</td><td class="m">Oct 4</td><td><span class="pill warn">Pending</span></td></tr>
+        <tr><td>RFI-013</td><td>Duct clash level 2</td><td class="m">Oct 2</td><td><span class="pill danger">Overdue</span></td></tr>
+        <tr><td>RFI-012</td><td>Door hardware set 4</td><td class="m">Sep 28</td><td><span class="pill ok">Answered</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="bottom"><span>Home</span><span>RFIs</span><span>Budget</span><span>More</span></div>
+</body>
+</html>

@@ -373,6 +373,8 @@ const PIMS_TOKENS = Object.freeze([
   "text-3",
   "line",
   "line-2",
+  "field-border",
+  "card-border",
   "accent",
   "accent-ink",
   "primary-from",

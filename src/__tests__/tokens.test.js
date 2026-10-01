@@ -122,6 +122,17 @@ describe('contrast (WCAG AA 4.5:1)', () => {
     it(`${name}: text-3 on bare bg-base`, () => {
       expect(ratio(parseColour(t['text-3']), base), `${name} text-3`).toBeGreaterThanOrEqual(4.5)
     })
+    it(`${name}: field-border is at least 3:1 on field (over bg-base) and on surface-solid`, () => {
+      const fb = parseColour(t['field-border'])
+      expect(fb.a, 'field-border must be solid').toBe(1)
+      const fieldBg = over(parseColour(t.field), base)
+      expect(ratio(fb, fieldBg), `${name} vs field`).toBeGreaterThanOrEqual(3)
+      expect(ratio(fb, parseColour(t['surface-solid'])), `${name} vs surface-solid`).toBeGreaterThanOrEqual(3)
+    })
+    it(`${name}: text on the background gradient peaks`, () => {
+      const stops = [...t['bg-image'].matchAll(/(#[0-9a-f]{6})s+0/gi)].map((m) => parseColour(m[1]))
+      for (const g of stops) for (const k of ['ink', 'text-2', 'text-3']) expect(ratio(parseColour(t[k]), g), `${name} ${k}`).toBeGreaterThanOrEqual(4.5)
+    })
     it(`${name}: status text on its soft background`, () => {
       for (const k of ['info', 'warn', 'danger', 'ok']) {
         const bg = over(parseColour(t[`${k}-soft`]), surface)
