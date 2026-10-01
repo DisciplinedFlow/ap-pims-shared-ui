@@ -407,7 +407,13 @@ const PIMS_TOKENS = Object.freeze([
 ]);
 const KNOWN = new Set(PIMS_TOKENS);
 const warned = /* @__PURE__ */ new Set();
-const isDev = () => typeof process !== "undefined" && !!process.env && process.env.NODE_ENV !== "production";
+const isDev = () => {
+  try {
+    return process.env.NODE_ENV !== "production";
+  } catch {
+    return false;
+  }
+};
 function pv(name, classic) {
   if (!KNOWN.has(name)) {
     if (isDev()) throw new Error(`unknown pims token: ${name}`);
@@ -501,7 +507,9 @@ function osDark() {
 }
 const readLook = () => read(LOOK_KEY, "classic") === "glass" ? "glass" : "classic";
 function usePimsUi({ allowed, themes = ["system", "light", "dark"] } = {}) {
-  const [override] = useState(() => previewOverride());
+  const [initialOverride] = useState(() => previewOverride());
+  const [cleared, setCleared] = useState(false);
+  const override = cleared ? null : initialOverride;
   const [stored, setLookState] = useState(readLook);
   const look = override ?? stored;
   const [theme, setThemeState] = useState(() => read(THEME_KEY, "system"));
@@ -538,16 +546,17 @@ function usePimsUi({ allowed, themes = ["system", "light", "dark"] } = {}) {
       }
     };
   }, []);
-  const active = override === "classic" ? false : (!!allowed || override === "glass") && look === "glass";
+  const active = override === "classic" ? false : (!!allowed || initialOverride !== null) && look === "glass";
   const resolvedTheme = resolveTheme(theme, dark);
   useEffect(() => {
     applyUi({ active, theme: resolvedTheme });
     return () => applyUi({ active: false, theme: resolvedTheme });
   }, [active, resolvedTheme]);
-  const canChoose = !!allowed || override !== null;
+  const canChoose = !!allowed || initialOverride !== null;
   const themeKey = themes.join("|");
   const setLook = useCallback((v) => {
     if (!canChoose) return;
+    setCleared(true);
     write(LOOK_KEY, v === "glass" ? "glass" : "classic");
     setLookState(v === "glass" ? "glass" : "classic");
     window.dispatchEvent(new Event(EVENT));

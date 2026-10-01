@@ -95,6 +95,17 @@ describe('preview override in the hook', () => {
     expect(result.current.canChoose).toBe(true)
     expect(root.getAttribute('data-pims-ui')).toBe('glass')
   })
+  it('an explicit setLook clears the override: on ?ui=glass, setLook(classic) turns it off, and back on', () => {
+    setUrl('/?ui=glass')
+    const { result } = renderHook(() => usePimsUi({ allowed: false }))
+    expect(result.current.active).toBe(true)
+    act(() => result.current.setLook('classic'))
+    expect(result.current.active).toBe(false)
+    expect(root.hasAttribute('data-pims-ui')).toBe(false)
+    expect(result.current.canChoose).toBe(true)
+    act(() => result.current.setLook('glass'))
+    expect(result.current.active).toBe(true)
+  })
   it('the override survives a storage sync and a later URL rewrite', () => {
     setUrl('/?ui=glass')
     const { result } = renderHook(() => usePimsUi({ allowed: false }))

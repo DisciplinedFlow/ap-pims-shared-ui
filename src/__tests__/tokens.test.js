@@ -51,14 +51,32 @@ const darkOnly = pick(`${SCOPE}[data-pims-theme="dark"]`)
 const fieldOnly = pick(`${SCOPE}[data-pims-theme="field"]`)
 const dark = { ...light, ...darkOnly }
 const field = { ...light, ...fieldOnly }
+const parseColourLoose = (v) => /^#[0-9a-f]{6}$/i.test(v)
 const isColour = (v) => /^(#|rgba?\()/.test(v)
 
 describe('print', () => {
   it('tokens.css defines no --pims- token outside @media screen (print gets classic fallbacks)', () => {
     for (const r of blocks) {
-      if (/--pims-[a-z0-9-]+s*:/.test(r.decls)) expect(r.media && r.media.startsWith('@media screen'), r.selectors[0]).toBe(true)
+      if (/--pims-[a-z0-9-]+\s*:/.test(r.decls)) expect(r.media && r.media.startsWith('@media screen'), r.selectors[0]).toBe(true)
     }
     expect(blocks.some((r) => r.media && /print/.test(r.media))).toBe(false)
+  })
+})
+
+describe('reduced transparency', () => {
+  it('dark and field themes get a solid surface too, with specificity at least that of the theme block', () => {
+    const rt = blocks.filter((r) => r.media && r.media.includes('prefers-reduced-transparency'))
+    for (const theme of ['dark', 'field']) {
+      const sel = `${SCOPE}[data-pims-theme="${theme}"]`
+      const rule = rt.find((r) => r.selectors.includes(sel))
+      expect(rule, theme).toBeDefined()
+      const d = declsOf(rule.decls)
+      expect(d.surface).toBe('var(--pims-surface-solid)')
+      expect(d.blur).toBe('none')
+    }
+  })
+  it('field has an opaque surface-solid to fall back on', () => {
+    expect(isColour(field['surface-solid']) && parseColourLoose(field['surface-solid'])).toBeTruthy()
   })
 })
 

@@ -89,7 +89,9 @@
   :root[data-pims-ui="glass"] { --pims-h-btn: 44px; --pims-h-field: 44px; }
 }
 @media screen and (prefers-reduced-transparency: reduce) {
-  :root[data-pims-ui="glass"] { --pims-blur: none; --pims-surface: var(--pims-surface-solid); }
+  :root[data-pims-ui="glass"],
+  :root[data-pims-ui="glass"][data-pims-theme="dark"],
+  :root[data-pims-ui="glass"][data-pims-theme="field"] { --pims-blur: none; --pims-surface: var(--pims-surface-solid); }
 }
 @media screen and (prefers-reduced-motion: reduce) {
   :root[data-pims-ui="glass"] { --pims-dur: 0ms; --pims-press-scale: 1; }

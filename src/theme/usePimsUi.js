@@ -20,7 +20,10 @@ const readLook = () => (read(LOOK_KEY, 'classic') === 'glass' ? 'glass' : 'class
 
 export function usePimsUi({ allowed, themes = ['system', 'light', 'dark'] } = {}) {
   // Captured once: a router rewriting the query string must not switch the preview look off mid-session.
-  const [override] = useState(() => previewOverride())
+  const [initialOverride] = useState(() => previewOverride())
+  // An explicit setLook clears the override for the rest of this mount, so the menu works on preview URLs.
+  const [cleared, setCleared] = useState(false)
+  const override = cleared ? null : initialOverride
   const [stored, setLookState] = useState(readLook)
   // The preview override has precedence over storage (and the storage sync cannot knock it back).
   const look = override ?? stored
@@ -48,7 +51,7 @@ export function usePimsUi({ allowed, themes = ['system', 'light', 'dark'] } = {}
   }, [])
 
   // A "classic" preview override forces off; staff never get glass from storage on a production host.
-  const active = override === 'classic' ? false : (!!allowed || override === 'glass') && look === 'glass'
+  const active = override === 'classic' ? false : (!!allowed || initialOverride !== null) && look === 'glass'
   const resolvedTheme = resolveTheme(theme, dark)
 
   useEffect(() => {
@@ -56,11 +59,12 @@ export function usePimsUi({ allowed, themes = ['system', 'light', 'dark'] } = {}
     return () => applyUi({ active: false, theme: resolvedTheme })
   }, [active, resolvedTheme])
 
-  const canChoose = !!allowed || override !== null
+  const canChoose = !!allowed || initialOverride !== null
   const themeKey = themes.join('|')
 
   const setLook = useCallback((v) => {
     if (!canChoose) return
+    setCleared(true)
     write(LOOK_KEY, v === 'glass' ? 'glass' : 'classic')
     setLookState(v === 'glass' ? 'glass' : 'classic')
     window.dispatchEvent(new Event(EVENT))
