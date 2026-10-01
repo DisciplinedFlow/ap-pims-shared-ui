@@ -1,6 +1,6 @@
 import { pv } from '../tokens/pv.js'
 
-const LABELS = { classic: 'Classic', glass: 'Soft glass', system: 'System', light: 'Light', dark: 'Dark', field: 'Field' }
+const LABELS = { classic: 'Classic', glass: 'Soft glass (new)', system: 'System', light: 'Light', dark: 'Dark', field: 'Field' }
 
 // Tokens are not defined in classic, so the touch target is a literal, decided by the pointer type.
 function coarsePointer() {

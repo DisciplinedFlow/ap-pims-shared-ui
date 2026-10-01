@@ -101,3 +101,5 @@ An opt-in look. With the flag off nothing changes: every `--pims-*` variable exi
    An unknown token name throws, so typos fail tests.
 
 Run `npm test` for the token scoping and WCAG contrast checks.
+
+Default look: when `allowed` is true and the user has not chosen, the look is Soft glass; a stored choice (including Classic) wins. When `allowed` is false the look is always Classic. The `ui_glass` feature is the release and rollback switch.

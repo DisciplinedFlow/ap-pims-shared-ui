@@ -507,13 +507,16 @@ function osDark() {
     return false;
   }
 }
-const readLook = () => read(LOOK_KEY, "classic") === "glass" ? "glass" : "classic";
+const readLook = () => {
+  const v = read(LOOK_KEY, null);
+  return v === "glass" || v === "classic" ? v : null;
+};
 function usePimsUi({ allowed, themes = ["system", "light", "dark"] } = {}) {
   const [initialOverride] = useState(() => previewOverride());
   const [cleared, setCleared] = useState(false);
   const override = cleared ? null : initialOverride;
   const [stored, setLookState] = useState(readLook);
-  const look = override ?? stored;
+  const look = override ?? stored ?? (allowed ? "glass" : "classic");
   const [theme, setThemeState] = useState(() => read(THEME_KEY, "system"));
   const [dark, setDark] = useState(osDark);
   useEffect(() => {
@@ -571,7 +574,7 @@ function usePimsUi({ allowed, themes = ["system", "light", "dark"] } = {}) {
   }, [themeKey]);
   return { active, look, theme, resolvedTheme, setLook, setTheme, canChoose, themes };
 }
-const LABELS = { classic: "Classic", glass: "Soft glass", system: "System", light: "Light", dark: "Dark", field: "Field" };
+const LABELS = { classic: "Classic", glass: "Soft glass (new)", system: "System", light: "Light", dark: "Dark", field: "Field" };
 function coarsePointer() {
   var _a, _b;
   try {

@@ -29,8 +29,30 @@ describe('usePimsUi', () => {
     expect(root.hasAttribute('data-pims-ui')).toBe(false)
     expect(result.current.canChoose).toBe(false)
   })
-  it('allowed + setLook(glass) → attribute, stored, light under light OS', () => {
+  it('allowed + empty storage → glass by default', () => {
     const { result } = renderHook(() => usePimsUi({ allowed: true }))
+    expect(result.current.look).toBe('glass')
+    expect(result.current.active).toBe(true)
+    expect(root.getAttribute('data-pims-ui')).toBe('glass')
+  })
+  it('allowed + stored classic → classic (explicit choice wins)', () => {
+    localStorage.setItem('pims.ui.look', 'classic')
+    const { result } = renderHook(() => usePimsUi({ allowed: true }))
+    expect(result.current.look).toBe('classic')
+    expect(result.current.active).toBe(false)
+    expect(root.hasAttribute('data-pims-ui')).toBe(false)
+  })
+  it('not allowed + empty storage → classic; allowed arriving later flips to glass', () => {
+    const { result, rerender } = renderHook(({ a }) => usePimsUi({ allowed: a }), { initialProps: { a: false } })
+    expect(result.current.active).toBe(false)
+    rerender({ a: true })
+    expect(result.current.active).toBe(true)
+    rerender({ a: false })
+    expect(result.current.active).toBe(false)
+  })
+  it('allowed + setLook(classic) then setLook(glass) → attribute, stored, light under light OS', () => {
+    const { result } = renderHook(() => usePimsUi({ allowed: true }))
+    act(() => result.current.setLook('classic'))
     expect(result.current.active).toBe(false)
     act(() => result.current.setLook('glass'))
     expect(root.getAttribute('data-pims-ui')).toBe('glass')
@@ -59,6 +81,7 @@ describe('usePimsUi', () => {
     expect(root.getAttribute('data-pims-theme')).toBe('field')
   })
   it('a storage event from another tab updates the look', () => {
+    localStorage.setItem('pims.ui.look', 'classic')
     const { result } = renderHook(() => usePimsUi({ allowed: true }))
     expect(result.current.look).toBe('classic')
     act(() => {
@@ -68,16 +91,16 @@ describe('usePimsUi', () => {
     expect(result.current.look).toBe('glass')
     expect(root.getAttribute('data-pims-ui')).toBe('glass')
   })
-  it('throwing localStorage still renders classic', async () => {
+  it('throwing localStorage still renders (default look follows the gate)', async () => {
     vi.resetModules() // fresh in-memory mirror
     const { usePimsUi } = await import('../theme/usePimsUi.js')
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('denied') })
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('denied') })
     const { result } = renderHook(() => usePimsUi({ allowed: true }))
-    expect(result.current.look).toBe('classic')
-    expect(result.current.active).toBe(false)
-    act(() => result.current.setLook('glass'))
+    expect(result.current.look).toBe('glass')
     expect(result.current.active).toBe(true)
+    act(() => result.current.setLook('classic'))
+    expect(result.current.active).toBe(false)
   })
   it('staff on a production host cannot choose', () => {
     const { result } = renderHook(() => usePimsUi({ allowed: false }))

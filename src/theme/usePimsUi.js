@@ -16,7 +16,8 @@ function write(key, value) {
 function osDark() {
   try { return !!globalThis.matchMedia?.(DARK_QUERY)?.matches } catch { return false }
 }
-const readLook = () => (read(LOOK_KEY, 'classic') === 'glass' ? 'glass' : 'classic')
+// null = nothing stored: the default then follows the gate (everyone allowed gets glass, otherwise classic).
+const readLook = () => { const v = read(LOOK_KEY, null); return v === 'glass' || v === 'classic' ? v : null }
 
 export function usePimsUi({ allowed, themes = ['system', 'light', 'dark'] } = {}) {
   // Captured once: a router rewriting the query string must not switch the preview look off mid-session.
@@ -26,7 +27,7 @@ export function usePimsUi({ allowed, themes = ['system', 'light', 'dark'] } = {}
   const override = cleared ? null : initialOverride
   const [stored, setLookState] = useState(readLook)
   // The preview override has precedence over storage (and the storage sync cannot knock it back).
-  const look = override ?? stored
+  const look = override ?? stored ?? (allowed ? 'glass' : 'classic')
   const [theme, setThemeState] = useState(() => read(THEME_KEY, 'system'))
   const [dark, setDark] = useState(osDark)
 
