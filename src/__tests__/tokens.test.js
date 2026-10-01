@@ -45,13 +45,22 @@ describe('scoping', () => {
 })
 
 const blocks = parseRules(files['tokens.css'])
-const pick = (sel) => declsOf(blocks.find((r) => r.selectors[0] === sel && !r.media).decls)
+const pick = (sel) => declsOf(blocks.find((r) => r.selectors[0] === sel && r.media === '@media screen').decls)
 const light = pick(SCOPE)
 const darkOnly = pick(`${SCOPE}[data-pims-theme="dark"]`)
 const fieldOnly = pick(`${SCOPE}[data-pims-theme="field"]`)
 const dark = { ...light, ...darkOnly }
 const field = { ...light, ...fieldOnly }
 const isColour = (v) => /^(#|rgba?\()/.test(v)
+
+describe('print', () => {
+  it('tokens.css defines no --pims- token outside @media screen (print gets classic fallbacks)', () => {
+    for (const r of blocks) {
+      if (/--pims-[a-z0-9-]+s*:/.test(r.decls)) expect(r.media && r.media.startsWith('@media screen'), r.selectors[0]).toBe(true)
+    }
+    expect(blocks.some((r) => r.media && /print/.test(r.media))).toBe(false)
+  })
+})
 
 describe('token coverage', () => {
   it('every PIMS_TOKENS name is defined in light', () => {
@@ -91,6 +100,9 @@ describe('contrast (WCAG AA 4.5:1)', () => {
     const surface = over(parseColour(t.surface), base)
     it(`${name}: text on surface`, () => {
       for (const k of ['ink', 'text-2', 'text-3']) expect(ratio(parseColour(t[k]), surface), `${name} ${k}`).toBeGreaterThanOrEqual(4.5)
+    })
+    it(`${name}: text-3 on bare bg-base`, () => {
+      expect(ratio(parseColour(t['text-3']), base), `${name} text-3`).toBeGreaterThanOrEqual(4.5)
     })
     it(`${name}: status text on its soft background`, () => {
       for (const k of ['info', 'warn', 'danger', 'ok']) {

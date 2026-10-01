@@ -2,7 +2,13 @@ import { pv } from '../tokens/pv.js'
 
 const LABELS = { classic: 'Classic', glass: 'Soft glass', system: 'System', light: 'Light', dark: 'Dark', field: 'Field' }
 
+// Tokens are not defined in classic, so the touch target is a literal, decided by the pointer type.
+function coarsePointer() {
+  try { return !!globalThis.matchMedia?.('(pointer: coarse)')?.matches } catch { return false }
+}
+
 function Segmented({ label, value, options, onChange }) {
+  const minHeight = coarsePointer() ? 44 : undefined
   return (
     <div role="group" aria-label={label} style={{ marginBottom: 8 }}>
       <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.04em', textTransform: 'uppercase', color: pv('text-3', '#6b7280'), marginBottom: 4 }}>{label}</div>
@@ -16,7 +22,7 @@ function Segmented({ label, value, options, onChange }) {
               aria-pressed={on}
               onClick={() => onChange(o)}
               style={{
-                flex: 1, border: 0, cursor: 'pointer', font: 'inherit', fontSize: 12, padding: '5px 10px',
+                flex: 1, minHeight, border: 0, cursor: 'pointer', font: 'inherit', fontSize: 12, padding: '5px 10px',
                 borderRadius: pv('r-btn', '8px'),
                 background: on ? pv('surface-solid', '#ffffff') : 'transparent',
                 color: on ? pv('ink', '#111827') : pv('text-2', '#4b5563'),

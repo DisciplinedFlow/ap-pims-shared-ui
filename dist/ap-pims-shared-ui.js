@@ -406,8 +406,16 @@ const PIMS_TOKENS = Object.freeze([
   "dur"
 ]);
 const KNOWN = new Set(PIMS_TOKENS);
+const warned = /* @__PURE__ */ new Set();
+const isDev = () => typeof process !== "undefined" && !!process.env && process.env.NODE_ENV !== "production";
 function pv(name, classic) {
-  if (!KNOWN.has(name)) throw new Error(`unknown pims token: ${name}`);
+  if (!KNOWN.has(name)) {
+    if (isDev()) throw new Error(`unknown pims token: ${name}`);
+    if (!warned.has(name)) {
+      warned.add(name);
+      console.warn(`unknown pims token: ${name}`);
+    }
+  }
   const fb = typeof classic === "number" ? `${classic}px` : String(classic);
   return `var(--pims-${name}, ${fb})`;
 }
@@ -493,8 +501,9 @@ function osDark() {
 }
 const readLook = () => read(LOOK_KEY, "classic") === "glass" ? "glass" : "classic";
 function usePimsUi({ allowed, themes = ["system", "light", "dark"] } = {}) {
-  const override = previewOverride();
-  const [look, setLookState] = useState(readLook);
+  const [override] = useState(() => previewOverride());
+  const [stored, setLookState] = useState(readLook);
+  const look = override ?? stored;
   const [theme, setThemeState] = useState(() => read(THEME_KEY, "system"));
   const [dark, setDark] = useState(osDark);
   useEffect(() => {
@@ -512,7 +521,8 @@ function usePimsUi({ allowed, themes = ["system", "light", "dark"] } = {}) {
     const onMq = () => setDark(osDark());
     try {
       mq = ((_a = window.matchMedia) == null ? void 0 : _a.call(window, DARK_QUERY)) || null;
-      (_b = mq == null ? void 0 : mq.addEventListener) == null ? void 0 : _b.call(mq, "change", onMq);
+      if (mq == null ? void 0 : mq.addEventListener) mq.addEventListener("change", onMq);
+      else (_b = mq == null ? void 0 : mq.addListener) == null ? void 0 : _b.call(mq, onMq);
     } catch {
       mq = null;
     }
@@ -522,7 +532,8 @@ function usePimsUi({ allowed, themes = ["system", "light", "dark"] } = {}) {
       window.removeEventListener(EVENT, sync);
       window.removeEventListener("storage", onStorage);
       try {
-        (_a2 = mq == null ? void 0 : mq.removeEventListener) == null ? void 0 : _a2.call(mq, "change", onMq);
+        if (mq == null ? void 0 : mq.removeEventListener) mq.removeEventListener("change", onMq);
+        else (_a2 = mq == null ? void 0 : mq.removeListener) == null ? void 0 : _a2.call(mq, onMq);
       } catch {
       }
     };
@@ -550,7 +561,16 @@ function usePimsUi({ allowed, themes = ["system", "light", "dark"] } = {}) {
   return { active, look, theme, resolvedTheme, setLook, setTheme, canChoose, themes };
 }
 const LABELS = { classic: "Classic", glass: "Soft glass", system: "System", light: "Light", dark: "Dark", field: "Field" };
+function coarsePointer() {
+  var _a, _b;
+  try {
+    return !!((_b = (_a = globalThis.matchMedia) == null ? void 0 : _a.call(globalThis, "(pointer: coarse)")) == null ? void 0 : _b.matches);
+  } catch {
+    return false;
+  }
+}
 function Segmented({ label, value, options, onChange }) {
+  const minHeight = coarsePointer() ? 44 : void 0;
   return /* @__PURE__ */ jsxs("div", { role: "group", "aria-label": label, style: { marginBottom: 8 }, children: [
     /* @__PURE__ */ jsx("div", { style: { fontSize: 11, fontWeight: 600, letterSpacing: ".04em", textTransform: "uppercase", color: pv("text-3", "#6b7280"), marginBottom: 4 }, children: label }),
     /* @__PURE__ */ jsx("div", { style: { display: "flex", gap: 2, padding: 2, background: pv("line", "#e5e7eb"), borderRadius: pv("r-btn", "8px") }, children: options.map((o) => {
@@ -563,6 +583,7 @@ function Segmented({ label, value, options, onChange }) {
           onClick: () => onChange(o),
           style: {
             flex: 1,
+            minHeight,
             border: 0,
             cursor: "pointer",
             font: "inherit",

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { pv } from '../tokens/pv.js'
 import { PIMS_TOKENS } from '../tokens/names.js'
 describe('pv', () => {
@@ -14,5 +14,19 @@ describe('pv', () => {
   })
   it('every name is kebab-case', () => {
     for (const n of PIMS_TOKENS) expect(n).toMatch(/^[a-z][a-z0-9-]*$/)
+  })
+  describe('in production', () => {
+    afterEach(() => { vi.unstubAllEnvs(); vi.restoreAllMocks() })
+    it('does not throw on an unknown name: returns the classic fallback and warns once', () => {
+      vi.stubEnv('NODE_ENV', 'production')
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      expect(pv('prod-only-typo', '#fff')).toBe('var(--pims-prod-only-typo, #fff)')
+      expect(pv('prod-only-typo', 8)).toBe('var(--pims-prod-only-typo, 8px)')
+      expect(warn).toHaveBeenCalledTimes(1)
+    })
+    it('still throws when NODE_ENV is not production', () => {
+      vi.stubEnv('NODE_ENV', 'development')
+      expect(() => pv('surfase', '#fff')).toThrow(/unknown pims token/i)
+    })
   })
 })

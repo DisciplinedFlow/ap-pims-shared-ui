@@ -19,8 +19,11 @@ function osDark() {
 const readLook = () => (read(LOOK_KEY, 'classic') === 'glass' ? 'glass' : 'classic')
 
 export function usePimsUi({ allowed, themes = ['system', 'light', 'dark'] } = {}) {
-  const override = previewOverride()
-  const [look, setLookState] = useState(readLook)
+  // Captured once: a router rewriting the query string must not switch the preview look off mid-session.
+  const [override] = useState(() => previewOverride())
+  const [stored, setLookState] = useState(readLook)
+  // The preview override has precedence over storage (and the storage sync cannot knock it back).
+  const look = override ?? stored
   const [theme, setThemeState] = useState(() => read(THEME_KEY, 'system'))
   const [dark, setDark] = useState(osDark)
 
@@ -33,13 +36,14 @@ export function usePimsUi({ allowed, themes = ['system', 'light', 'dark'] } = {}
     const onMq = () => setDark(osDark())
     try {
       mq = window.matchMedia?.(DARK_QUERY) || null
-      mq?.addEventListener?.('change', onMq)
+      if (mq?.addEventListener) mq.addEventListener('change', onMq)
+      else mq?.addListener?.(onMq) // Safari < 14
     } catch { mq = null }
     setDark(osDark())
     return () => {
       window.removeEventListener(EVENT, sync)
       window.removeEventListener('storage', onStorage)
-      try { mq?.removeEventListener?.('change', onMq) } catch { /* ignore */ }
+      try { if (mq?.removeEventListener) mq.removeEventListener('change', onMq); else mq?.removeListener?.(onMq) } catch { /* ignore */ }
     }
   }, [])
 

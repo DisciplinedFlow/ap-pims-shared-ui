@@ -1,93 +1,96 @@
 /* Soft glass tokens (spec §5a). Defined ONLY while the preview look is on, so every
    pv('x', classic) falls back to today's value when it is off — classic stays pixel-identical. */
-:root[data-pims-ui="glass"] {
-  color-scheme: light;
-  --pims-font: Inter, -apple-system, "Segoe UI", system-ui, sans-serif;
-  --pims-bg-base: #f3f5f9;
-  --pims-bg-image: radial-gradient(1200px 500px at 10% -10%, #dbeafe 0, transparent 60%), radial-gradient(900px 500px at 100% 0, #e0f2f1 0, transparent 55%);
-  --pims-bar: rgba(255,255,255,.6);
-  --pims-side: rgba(255,255,255,.35);
-  --pims-surface: rgba(255,255,255,.78);
-  --pims-surface-solid: #ffffff;
-  --pims-field: rgba(255,255,255,.7);
-  --pims-sel: rgba(255,255,255,.9);
-  --pims-hover: rgba(255,255,255,.55);
-  --pims-ink: #111827;
-  --pims-text-2: #4b5563;
-  --pims-text-3: #6b7280;
-  --pims-line: rgba(17,24,39,.08);
-  --pims-line-2: rgba(17,24,39,.12);
-  --pims-accent: #1667e0;
-  --pims-accent-ink: #0b52bf;
-  --pims-primary-from: #1667e0;
-  --pims-primary-to: #0b52bf;
-  --pims-primary: linear-gradient(180deg, var(--pims-primary-from), var(--pims-primary-to));
-  --pims-on-primary: #ffffff;
-  --pims-primary-shadow: 0 6px 16px -6px rgba(11,82,191,.55), inset 0 1px 0 rgba(255,255,255,.3);
-  --pims-secondary-shadow: 0 1px 2px rgba(17,24,39,.06);
-  --pims-card-shadow: 0 1px 1px rgba(17,24,39,.04), 0 8px 24px -12px rgba(17,24,39,.18);
-  --pims-chip-on: #111827;
-  --pims-chip-on-ink: #ffffff;
-  --pims-info: #0b52bf;   --pims-info-soft: rgba(22,103,224,.12);
-  --pims-warn: #8a5300;   --pims-warn-soft: rgba(245,158,11,.16);
-  --pims-danger: #b4232a; --pims-danger-soft: rgba(220,38,38,.10);
-  --pims-ok: #0f6e3c;     --pims-ok-soft: rgba(16,185,129,.14);
-  --pims-r-btn: 999px; --pims-r-chip: 999px; --pims-r-field: 10px; --pims-r-card: 16px; --pims-r-row: 10px;
-  --pims-h-btn: 36px; --pims-h-field: 36px; --pims-pad-btn: 0 16px;
-  --pims-blur: blur(18px) saturate(1.4);
-  --pims-focus-ring: 0 0 0 3px rgba(22,103,224,.35);
-  --pims-press-scale: .97;
-  --pims-dur: 150ms;
+/* Everything is screen-only: in print no --pims-* exists, so every pv() falls back to classic. */
+@media screen {
+  :root[data-pims-ui="glass"] {
+    color-scheme: light;
+    --pims-font: Inter, -apple-system, "Segoe UI", system-ui, sans-serif;
+    --pims-bg-base: #f3f5f9;
+    --pims-bg-image: radial-gradient(1200px 500px at 10% -10%, #dbeafe 0, transparent 60%), radial-gradient(900px 500px at 100% 0, #e0f2f1 0, transparent 55%);
+    --pims-bar: rgba(255,255,255,.6);
+    --pims-side: rgba(255,255,255,.35);
+    --pims-surface: rgba(255,255,255,.78);
+    --pims-surface-solid: #ffffff;
+    --pims-field: rgba(255,255,255,.7);
+    --pims-sel: rgba(255,255,255,.9);
+    --pims-hover: rgba(255,255,255,.55);
+    --pims-ink: #111827;
+    --pims-text-2: #4b5563;
+    --pims-text-3: #68707d;
+    --pims-line: rgba(17,24,39,.08);
+    --pims-line-2: rgba(17,24,39,.12);
+    --pims-accent: #1667e0;
+    --pims-accent-ink: #0b52bf;
+    --pims-primary-from: #1667e0;
+    --pims-primary-to: #0b52bf;
+    --pims-primary: linear-gradient(180deg, var(--pims-primary-from), var(--pims-primary-to));
+    --pims-on-primary: #ffffff;
+    --pims-primary-shadow: 0 6px 16px -6px rgba(11,82,191,.55), inset 0 1px 0 rgba(255,255,255,.3);
+    --pims-secondary-shadow: 0 1px 2px rgba(17,24,39,.06);
+    --pims-card-shadow: 0 1px 1px rgba(17,24,39,.04), 0 8px 24px -12px rgba(17,24,39,.18);
+    --pims-chip-on: #111827;
+    --pims-chip-on-ink: #ffffff;
+    --pims-info: #0b52bf;   --pims-info-soft: rgba(22,103,224,.12);
+    --pims-warn: #8a5300;   --pims-warn-soft: rgba(245,158,11,.16);
+    --pims-danger: #b4232a; --pims-danger-soft: rgba(220,38,38,.10);
+    --pims-ok: #0f6e3c;     --pims-ok-soft: rgba(16,185,129,.14);
+    --pims-r-btn: 999px; --pims-r-chip: 999px; --pims-r-field: 10px; --pims-r-card: 16px; --pims-r-row: 10px;
+    --pims-h-btn: 36px; --pims-h-field: 36px; --pims-pad-btn: 0 16px;
+    --pims-blur: blur(18px) saturate(1.4);
+    --pims-focus-ring: 0 0 0 3px rgba(22,103,224,.35);
+    --pims-press-scale: .97;
+    --pims-dur: 150ms;
+  }
+  :root[data-pims-ui="glass"][data-pims-theme="dark"] {
+    color-scheme: dark;
+    --pims-bg-base: #0a0d14;
+    --pims-bg-image: radial-gradient(1200px 500px at 10% -10%, #1e293b 0, transparent 60%), radial-gradient(900px 500px at 100% 0, #0f3a3d 0, transparent 55%);
+    --pims-bar: rgba(20,24,33,.6);
+    --pims-side: rgba(20,24,33,.35);
+    --pims-surface: rgba(28,32,43,.72);
+    --pims-surface-solid: #161a23;
+    --pims-field: rgba(28,32,43,.7);
+    --pims-sel: rgba(255,255,255,.08);
+    --pims-hover: rgba(255,255,255,.04);
+    --pims-ink: #f3f4f6;
+    --pims-text-2: #b4bac6;
+    --pims-text-3: #9098a6;
+    --pims-line: rgba(255,255,255,.07);
+    --pims-line-2: rgba(255,255,255,.12);
+    --pims-accent: #3b8bff;
+    --pims-accent-ink: #8ab8ff;
+    --pims-primary-from: #2770e6;
+    --pims-primary-to: #1659c9;
+    --pims-on-primary: #ffffff;
+    --pims-primary-shadow: 0 6px 18px -6px rgba(59,139,255,.5), inset 0 1px 0 rgba(255,255,255,.18);
+    --pims-secondary-shadow: none;
+    --pims-card-shadow: 0 10px 30px -12px rgba(0,0,0,.6);
+    --pims-chip-on: #f3f4f6;
+    --pims-chip-on-ink: #0a0d14;
+    --pims-info: #8ab8ff;   --pims-info-soft: rgba(59,139,255,.16);
+    --pims-warn: #fcd34d;   --pims-warn-soft: rgba(245,158,11,.15);
+    --pims-danger: #ff8a8a; --pims-danger-soft: rgba(255,99,99,.14);
+    --pims-ok: #6ee7b7;     --pims-ok-soft: rgba(16,185,129,.15);
+    --pims-focus-ring: 0 0 0 3px rgba(59,139,255,.45);
+  }
+  /* Field: outdoor/sunlight — solid surfaces, no blur, strongest ink. */
+  :root[data-pims-ui="glass"][data-pims-theme="field"] {
+    color-scheme: light;
+    --pims-bg-base: #f4f6f8;
+    --pims-bg-image: none;
+    --pims-bar: #ffffff; --pims-side: #ffffff; --pims-surface: #ffffff; --pims-field: #ffffff;
+    --pims-ink: #0b1220; --pims-text-2: #334155; --pims-text-3: #475569;
+    --pims-line: #d5dce4; --pims-line-2: #c3ccd7;
+    --pims-blur: none;
+    --pims-card-shadow: 0 1px 0 #d5dce4;
+  }
 }
-:root[data-pims-ui="glass"][data-pims-theme="dark"] {
-  color-scheme: dark;
-  --pims-bg-base: #0a0d14;
-  --pims-bg-image: radial-gradient(1200px 500px at 10% -10%, #1e293b 0, transparent 60%), radial-gradient(900px 500px at 100% 0, #0f3a3d 0, transparent 55%);
-  --pims-bar: rgba(20,24,33,.6);
-  --pims-side: rgba(20,24,33,.35);
-  --pims-surface: rgba(28,32,43,.72);
-  --pims-surface-solid: #161a23;
-  --pims-field: rgba(28,32,43,.7);
-  --pims-sel: rgba(255,255,255,.08);
-  --pims-hover: rgba(255,255,255,.04);
-  --pims-ink: #f3f4f6;
-  --pims-text-2: #b4bac6;
-  --pims-text-3: #9098a6;
-  --pims-line: rgba(255,255,255,.07);
-  --pims-line-2: rgba(255,255,255,.12);
-  --pims-accent: #3b8bff;
-  --pims-accent-ink: #8ab8ff;
-  --pims-primary-from: #2770e6;
-  --pims-primary-to: #1659c9;
-  --pims-on-primary: #ffffff;
-  --pims-primary-shadow: 0 6px 18px -6px rgba(59,139,255,.5), inset 0 1px 0 rgba(255,255,255,.18);
-  --pims-secondary-shadow: none;
-  --pims-card-shadow: 0 10px 30px -12px rgba(0,0,0,.6);
-  --pims-chip-on: #f3f4f6;
-  --pims-chip-on-ink: #0a0d14;
-  --pims-info: #8ab8ff;   --pims-info-soft: rgba(59,139,255,.16);
-  --pims-warn: #fcd34d;   --pims-warn-soft: rgba(245,158,11,.15);
-  --pims-danger: #ff8a8a; --pims-danger-soft: rgba(255,99,99,.14);
-  --pims-ok: #6ee7b7;     --pims-ok-soft: rgba(16,185,129,.15);
-  --pims-focus-ring: 0 0 0 3px rgba(59,139,255,.45);
-}
-/* Field: outdoor/sunlight — solid surfaces, no blur, strongest ink. */
-:root[data-pims-ui="glass"][data-pims-theme="field"] {
-  color-scheme: light;
-  --pims-bg-base: #f4f6f8;
-  --pims-bg-image: none;
-  --pims-bar: #ffffff; --pims-side: #ffffff; --pims-surface: #ffffff; --pims-field: #ffffff;
-  --pims-ink: #0b1220; --pims-text-2: #334155; --pims-text-3: #475569;
-  --pims-line: #d5dce4; --pims-line-2: #c3ccd7;
-  --pims-blur: none;
-  --pims-card-shadow: 0 1px 0 #d5dce4;
-}
-@media (pointer: coarse) {
+@media screen and (pointer: coarse) {
   :root[data-pims-ui="glass"] { --pims-h-btn: 44px; --pims-h-field: 44px; }
 }
-@media (prefers-reduced-transparency: reduce) {
+@media screen and (prefers-reduced-transparency: reduce) {
   :root[data-pims-ui="glass"] { --pims-blur: none; --pims-surface: var(--pims-surface-solid); }
 }
-@media (prefers-reduced-motion: reduce) {
+@media screen and (prefers-reduced-motion: reduce) {
   :root[data-pims-ui="glass"] { --pims-dur: 0ms; --pims-press-scale: 1; }
 }
