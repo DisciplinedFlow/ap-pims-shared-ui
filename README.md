@@ -69,3 +69,35 @@ Then bump the pinned tag in each consuming app's `package.json`.
 Peer dependency `^18.2.0 || ^19.0.0`. The apps span React 18.2 (Labor), 18.3
 (Lookahead) and 19.2 (DJR, PM Portal); React is external in the build so no app
 ends up with a second copy.
+
+## Soft glass tokens + theme engine (v0.3)
+
+An opt-in look. With the flag off nothing changes: every `--pims-*` variable exists only while `<html data-pims-ui="glass">` is set.
+
+1. Import the CSS once, at the app entry:
+   ```js
+   import 'ap-pims-shared-ui/tokens.css'
+   import 'ap-pims-shared-ui/base.css'
+   ```
+2. Mount the hook near the app root, with the gate from `fetchUiAllowed` (the `ui_glass` feature wins when present, otherwise only `role === 'owner'`):
+   ```js
+   import { usePimsUi, fetchUiAllowed } from 'ap-pims-shared-ui'
+   const [allowed, setAllowed] = useState(false)
+   useEffect(() => { fetchUiAllowed(supabase, role).then(setAllowed) }, [role])
+   const ui = usePimsUi({ allowed, themes: ['system', 'light', 'dark'] }) // add 'field' in DJR, Labor, Lookahead
+   ```
+   On `localhost`, `127.0.0.1` and `deploy-preview-N--*` hosts, `?ui=glass` / `?ui=classic` forces the look. Production hosts ignore it.
+3. Put the switcher inside an existing menu or panel (it has no positioning of its own, and renders nothing when `ui.canChoose` is false):
+   ```jsx
+   import { PimsLookMenu } from 'ap-pims-shared-ui'
+   <PimsLookMenu ui={ui} />
+   ```
+4. Use `pv(name, classic)` for every themed style value. **The fallback must equal the replaced literal, character for character**; numbers become `px`:
+   ```js
+   import { pv } from 'ap-pims-shared-ui'
+   style={{ background: pv('surface', '#fff'), borderRadius: pv('r-btn', 8) }}
+   // → var(--pims-surface, #fff) / var(--pims-r-btn, 8px)
+   ```
+   An unknown token name throws, so typos fail tests.
+
+Run `npm test` for the token scoping and WCAG contrast checks.

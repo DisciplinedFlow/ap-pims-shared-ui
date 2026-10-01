@@ -1,0 +1,4 @@
+:root[data-pims-ui="glass"] body { background: var(--pims-bg-image), var(--pims-bg-base); background-attachment: fixed; color: var(--pims-ink); font-family: var(--pims-font); }
+:root[data-pims-ui="glass"] :focus-visible { outline: none; box-shadow: var(--pims-focus-ring); border-radius: 8px; }
+:root[data-pims-ui="glass"] button:not(:disabled):active { transform: scale(var(--pims-press-scale)); transition: transform var(--pims-dur) ease; }
+@media print { :root[data-pims-ui="glass"] body { background: #fff; color: #000; } }

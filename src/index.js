@@ -17,3 +17,10 @@ export {
   SCREENSHOT_BUCKET, MAX_SCREENSHOTS, MAX_SCREENSHOT_BYTES,
 } from "./requestsApi";
 export { F, ACCENT } from "./theme";
+
+// Soft glass tokens + theme engine (v0.3). CSS: 'ap-pims-shared-ui/tokens.css', 'ap-pims-shared-ui/base.css'.
+export { pv } from "./tokens/pv.js";
+export { PIMS_TOKENS } from "./tokens/names.js";
+export * from "./theme/uiTheme.js";
+export { usePimsUi } from "./theme/usePimsUi.js";
+export { PimsLookMenu } from "./theme/PimsLookMenu.jsx";
