@@ -4,14 +4,20 @@ import { LOOK_KEY, THEME_KEY, applyUi, previewOverride, resolveTheme } from './u
 const EVENT = 'pims:ui'
 const DARK_QUERY = '(prefers-color-scheme: dark)'
 
-// In-memory mirror so a view with blocked storage (private mode) still honours the choice it just made.
+// Choices storage refused to save (private mode, quota full). Read first, so this view still honours
+// the choice it just made even when getItem works and would return the older stored value.
 const mem = {}
 function read(key, fallback) {
-  try { return globalThis.localStorage?.getItem(key) || fallback } catch { return mem[key] || fallback }
+  if (key in mem) return mem[key] || fallback
+  try { return globalThis.localStorage?.getItem(key) || fallback } catch { return fallback }
 }
 function write(key, value) {
-  mem[key] = value
-  try { globalThis.localStorage?.setItem(key, value) } catch { /* private mode: works for this view only */ }
+  try {
+    globalThis.localStorage?.setItem(key, value)
+    delete mem[key]
+  } catch {
+    mem[key] = value
+  }
 }
 function osDark() {
   try { return !!globalThis.matchMedia?.(DARK_QUERY)?.matches } catch { return false }

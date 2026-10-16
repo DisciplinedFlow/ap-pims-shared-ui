@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { resolveAllowed, fetchUiAllowed, previewOverride, resolveTheme, applyUi, UI_ATTR, THEME_ATTR } from '../theme/uiTheme.js'
 describe('resolveAllowed', () => {
   it('owner without registry entry → allowed', () => expect(resolveAllowed({ role: 'owner', features: [] })).toBe(true))
@@ -10,6 +10,9 @@ describe('resolveAllowed', () => {
   it('null features → role fallback', () => expect(resolveAllowed({ role: 'owner', features: null })).toBe(true))
 })
 describe('fetchUiAllowed', () => {
+  let log
+  beforeEach(() => { log = vi.spyOn(console, 'error').mockImplementation(() => {}) })
+  afterEach(() => log.mockRestore())
   const sb = (res) => ({ rpc: async (n) => { expect(n).toBe('fn_my_features_v1'); if (res instanceof Error) throw res; return res } })
   it('reads the map', async () => expect(await fetchUiAllowed(sb({ data: { ui_glass: true }, error: null }), 'pm')).toBe(true))
   it('absent key → owner only', async () => {
@@ -21,6 +24,17 @@ describe('fetchUiAllowed', () => {
     expect(await fetchUiAllowed(sb({ data: null, error: { message: 'x' } }), 'pm')).toBe(false)
   })
   it('throw → owner only', async () => expect(await fetchUiAllowed(sb(new Error('net')), 'pm')).toBe(false))
+  it('error and throw are logged, not swallowed', async () => {
+    await fetchUiAllowed(sb({ data: null, error: { message: 'x' } }), 'pm')
+    await fetchUiAllowed(sb(new Error('net')), 'owner')
+    expect(log).toHaveBeenCalledTimes(2)
+    expect(log.mock.calls[0][0]).toMatch(/fn_my_features_v1/)
+    expect(log.mock.calls[1][0]).toMatch(/fn_my_features_v1/)
+  })
+  it('a successful check logs nothing', async () => {
+    await fetchUiAllowed(sb({ data: { ui_glass: true }, error: null }), 'pm')
+    expect(log).not.toHaveBeenCalled()
+  })
 })
 describe('previewOverride', () => {
   const at = (href) => new URL(href)

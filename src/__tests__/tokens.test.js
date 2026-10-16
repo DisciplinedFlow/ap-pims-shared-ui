@@ -143,7 +143,7 @@ describe('contrast (WCAG AA 4.5:1)', () => {
       expect(ratio(fb, parseColour(t['surface-solid'])), `${name} vs surface-solid`).toBeGreaterThanOrEqual(3)
     })
     it(`${name}: text on the background gradient peaks`, () => {
-      const stops = [...t['bg-image'].matchAll(/(#[0-9a-f]{6})s+0/gi)].map((m) => parseColour(m[1]))
+      const stops = [...t['bg-image'].matchAll(/(#[0-9a-f]{6})\s+0/gi)].map((m) => parseColour(m[1]))
       for (const g of stops) for (const k of ['ink', 'text-2', 'text-3']) expect(ratio(parseColour(t[k]), g), `${name} ${k}`).toBeGreaterThanOrEqual(4.5)
     })
     it(`${name}: status text on its soft background`, () => {

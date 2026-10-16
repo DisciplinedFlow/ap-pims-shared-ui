@@ -19,14 +19,16 @@ export function resolveAllowed({ role, features } = {}) {
 }
 
 // fn_my_features_v1 returns a plain object map { feature_key: boolean } (Portal loadMyFeatures).
+// On failure the owner-only default applies, logged so a broken check is visible rather than looking like "not allowed".
 export async function fetchUiAllowed(supabase, role) {
   try {
     const { data, error } = await supabase.rpc('fn_my_features_v1')
-    if (error) return role === 'owner'
-    return resolveAllowed({ role, features: data })
-  } catch {
-    return role === 'owner'
+    if (!error) return resolveAllowed({ role, features: data })
+    console.error('[ap-pims-shared-ui] fn_my_features_v1 failed; using the owner-only default', { role, error })
+  } catch (err) {
+    console.error('[ap-pims-shared-ui] fn_my_features_v1 threw; using the owner-only default', { role, err })
   }
+  return role === 'owner'
 }
 
 export function previewOverride(loc = globalThis.window?.location) {

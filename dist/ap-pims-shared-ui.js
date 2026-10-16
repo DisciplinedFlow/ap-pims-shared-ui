@@ -444,11 +444,12 @@ function resolveAllowed({ role, features } = {}) {
 async function fetchUiAllowed(supabase, role) {
   try {
     const { data, error } = await supabase.rpc("fn_my_features_v1");
-    if (error) return role === "owner";
-    return resolveAllowed({ role, features: data });
-  } catch {
-    return role === "owner";
+    if (!error) return resolveAllowed({ role, features: data });
+    console.error("[ap-pims-shared-ui] fn_my_features_v1 failed; using the owner-only default", { role, error });
+  } catch (err) {
+    console.error("[ap-pims-shared-ui] fn_my_features_v1 threw; using the owner-only default", { role, err });
   }
+  return role === "owner";
 }
 function previewOverride(loc = ((_a) => (_a = globalThis.window) == null ? void 0 : _a.location)()) {
   if (!loc) return null;
@@ -485,18 +486,20 @@ const DARK_QUERY = "(prefers-color-scheme: dark)";
 const mem = {};
 function read(key, fallback) {
   var _a;
+  if (key in mem) return mem[key] || fallback;
   try {
     return ((_a = globalThis.localStorage) == null ? void 0 : _a.getItem(key)) || fallback;
   } catch {
-    return mem[key] || fallback;
+    return fallback;
   }
 }
 function write(key, value) {
   var _a;
-  mem[key] = value;
   try {
     (_a = globalThis.localStorage) == null ? void 0 : _a.setItem(key, value);
+    delete mem[key];
   } catch {
+    mem[key] = value;
   }
 }
 function osDark() {

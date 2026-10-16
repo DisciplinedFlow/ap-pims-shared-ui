@@ -102,6 +102,15 @@ describe('usePimsUi', () => {
     act(() => result.current.setLook('classic'))
     expect(result.current.active).toBe(false)
   })
+  it('storage that reads but refuses writes (quota) keeps the choice for this view', async () => {
+    vi.resetModules() // fresh in-memory mirror
+    const { usePimsUi } = await import('../theme/usePimsUi.js')
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('QuotaExceededError') })
+    const { result } = renderHook(() => usePimsUi({ allowed: true }))
+    act(() => result.current.setLook('classic'))
+    expect(result.current.look).toBe('classic')
+    expect(result.current.active).toBe(false)
+  })
   it('staff on a production host cannot choose', () => {
     const { result } = renderHook(() => usePimsUi({ allowed: false }))
     act(() => result.current.setLook('glass'))
