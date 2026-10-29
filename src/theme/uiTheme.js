@@ -12,13 +12,18 @@ const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k)
 export function resolveAllowed({ role, features } = {}) {
   if (Array.isArray(features)) {
     if (features.includes(UI_FEATURE)) return true
+    // Row shape ({ feature_key, enabled|allowed }), in case the RPC is ever changed to RETURNS TABLE.
+    const row = features.find((f) => f && typeof f === 'object' && f.feature_key === UI_FEATURE)
+    if (row) return (has(row, 'enabled') ? row.enabled : row.allowed) === true
   } else if (features && typeof features === 'object' && has(features, UI_FEATURE)) {
     return features[UI_FEATURE] === true
   }
   return role === 'owner'
 }
 
-// fn_my_features_v1 returns a plain object map { feature_key: boolean } (Portal loadMyFeatures).
+// fn_my_features_v1 returns a plain object map { feature_key: boolean } (Portal loadMyFeatures): it is
+// RETURNS jsonb over jsonb_object_agg (ap-pims-schema 20260929050000_feature_access.sql, its only definition),
+// and '{}' when the registry is empty. resolveAllowed also accepts a key list or rows, for safety.
 // On failure the owner-only default applies, logged so a broken check is visible rather than looking like "not allowed".
 export async function fetchUiAllowed(supabase, role) {
   try {

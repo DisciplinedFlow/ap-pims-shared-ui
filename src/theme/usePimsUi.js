@@ -22,6 +22,27 @@ function write(key, value) {
 function osDark() {
   try { return !!globalThis.matchMedia?.(DARK_QUERY)?.matches } catch { return false }
 }
+// Mounted consumers and what each wants, in claim order (a Map keeps insertion order; re-claiming moves
+// an entry to the end). Glass is on while any mounted consumer wants it, with the newest such claim's theme;
+// a consumer still waiting for its gate (allowed undefined) cannot switch it off for the others. All
+// consumers share storage and the pims:ui event, so a real choice (setLook classic) turns every one off.
+const consumers = new Map()
+function applyAll(fallbackTheme) {
+  let on = null
+  for (const s of consumers.values()) if (s.active) on = s
+  applyUi(on || { active: false, theme: fallbackTheme })
+}
+function claim(owner, state) {
+  consumers.delete(owner)
+  consumers.set(owner, state)
+  applyAll(state.theme)
+}
+function release(owner) {
+  const theme = consumers.get(owner)?.theme
+  consumers.delete(owner)
+  applyAll(theme)
+}
+
 // null = nothing stored: the default then follows the gate (everyone allowed gets glass, otherwise classic).
 const readLook = () => { const v = read(LOOK_KEY, null); return v === 'glass' || v === 'classic' ? v : null }
 
@@ -61,10 +82,13 @@ export function usePimsUi({ allowed, themes = ['system', 'light', 'dark'] } = {}
   const active = override === 'classic' ? false : (!!allowed || initialOverride !== null) && look === 'glass'
   const resolvedTheme = resolveTheme(theme, dark)
 
+  // Several consumers can be mounted at once (app shell + a settings panel). Each registers what it wants;
+  // see claim/release above. Only the last consumer to unmount clears the page.
+  const [owner] = useState(() => ({}))
   useEffect(() => {
-    applyUi({ active, theme: resolvedTheme })
-    return () => applyUi({ active: false, theme: resolvedTheme })
-  }, [active, resolvedTheme])
+    claim(owner, { active, theme: resolvedTheme })
+    return () => release(owner)
+  }, [owner, active, resolvedTheme])
 
   const canChoose = !!allowed || initialOverride !== null
   const themeKey = themes.join('|')

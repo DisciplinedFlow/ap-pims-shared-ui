@@ -1,6 +1,6 @@
 {
   "name": "ap-pims-shared-ui",
-  "version": "0.3.0-rc.1",
+  "version": "0.3.0-rc.2",
   "description": "Shared UI components for the AP PIMS apps (DJR, Labor, Lookahead, PM Portal).",
   "license": "UNLICENSED",
   "private": false,

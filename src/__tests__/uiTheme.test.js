@@ -8,6 +8,31 @@ describe('resolveAllowed', () => {
   it('map true for staff → allowed', () => expect(resolveAllowed({ role: 'pm', features: { ui_glass: true } })).toBe(true))
   it('map without the key → role fallback', () => expect(resolveAllowed({ role: 'pm', features: { team_chat: true } })).toBe(false))
   it('null features → role fallback', () => expect(resolveAllowed({ role: 'owner', features: null })).toBe(true))
+  // Open item 3 (PR #2): the shape fn_my_features_v1 really returns, and the shapes it might return if changed.
+  describe('fn_my_features_v1 result shapes', () => {
+    it('the real shape (RETURNS jsonb, jsonb_object_agg): { key: boolean } decides for staff and owner', () => {
+      const real = { ui_glass: true, team_chat: false, document_center: true }
+      expect(resolveAllowed({ role: 'pm', features: real })).toBe(true)
+      expect(resolveAllowed({ role: 'owner', features: { ...real, ui_glass: false } })).toBe(false)
+    })
+    it('empty registry ({}): role default', () => {
+      expect(resolveAllowed({ role: 'pm', features: {} })).toBe(false)
+      expect(resolveAllowed({ role: 'owner', features: {} })).toBe(true)
+    })
+    it('rows [{ feature_key, enabled }] are read, not dropped to the role default', () => {
+      expect(resolveAllowed({ role: 'pm', features: [{ feature_key: 'team_chat', enabled: false }, { feature_key: 'ui_glass', enabled: true }] })).toBe(true)
+      expect(resolveAllowed({ role: 'owner', features: [{ feature_key: 'ui_glass', enabled: false }] })).toBe(false)
+      expect(resolveAllowed({ role: 'pm', features: [{ feature_key: 'ui_glass', allowed: true }] })).toBe(true)
+    })
+    it('rows without ui_glass, or junk entries: role default', () => {
+      expect(resolveAllowed({ role: 'pm', features: [null, 3, { feature_key: 'team_chat', enabled: true }] })).toBe(false)
+      expect(resolveAllowed({ role: 'owner', features: [null] })).toBe(true)
+    })
+    it('a non-boolean value is not a yes', () => {
+      expect(resolveAllowed({ role: 'pm', features: { ui_glass: 'true' } })).toBe(false)
+      expect(resolveAllowed({ role: 'pm', features: [{ feature_key: 'ui_glass', enabled: 'yes' }] })).toBe(false)
+    })
+  })
 })
 describe('fetchUiAllowed', () => {
   let log

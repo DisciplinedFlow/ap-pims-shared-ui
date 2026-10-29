@@ -436,6 +436,8 @@ const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 function resolveAllowed({ role, features } = {}) {
   if (Array.isArray(features)) {
     if (features.includes(UI_FEATURE)) return true;
+    const row = features.find((f) => f && typeof f === "object" && f.feature_key === UI_FEATURE);
+    if (row) return (has(row, "enabled") ? row.enabled : row.allowed) === true;
   } else if (features && typeof features === "object" && has(features, UI_FEATURE)) {
     return features[UI_FEATURE] === true;
   }
@@ -510,6 +512,23 @@ function osDark() {
     return false;
   }
 }
+const consumers = /* @__PURE__ */ new Map();
+function applyAll(fallbackTheme) {
+  let on = null;
+  for (const s of consumers.values()) if (s.active) on = s;
+  applyUi(on || { active: false, theme: fallbackTheme });
+}
+function claim(owner, state) {
+  consumers.delete(owner);
+  consumers.set(owner, state);
+  applyAll(state.theme);
+}
+function release(owner) {
+  var _a;
+  const theme = (_a = consumers.get(owner)) == null ? void 0 : _a.theme;
+  consumers.delete(owner);
+  applyAll(theme);
+}
 const readLook = () => {
   const v = read(LOOK_KEY, null);
   return v === "glass" || v === "classic" ? v : null;
@@ -556,10 +575,11 @@ function usePimsUi({ allowed, themes = ["system", "light", "dark"] } = {}) {
   }, []);
   const active = override === "classic" ? false : (!!allowed || initialOverride !== null) && look === "glass";
   const resolvedTheme = resolveTheme(theme, dark);
+  const [owner] = useState(() => ({}));
   useEffect(() => {
-    applyUi({ active, theme: resolvedTheme });
-    return () => applyUi({ active: false, theme: resolvedTheme });
-  }, [active, resolvedTheme]);
+    claim(owner, { active, theme: resolvedTheme });
+    return () => release(owner);
+  }, [owner, active, resolvedTheme]);
   const canChoose = !!allowed || initialOverride !== null;
   const themeKey = themes.join("|");
   const setLook = useCallback((v) => {

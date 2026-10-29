@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { StrictMode } from 'react'
 import { renderHook, act, render, screen, cleanup } from '@testing-library/react'
 import { usePimsUi } from '../theme/usePimsUi.js'
 import { PimsLookMenu } from '../theme/PimsLookMenu.jsx'
@@ -115,6 +116,104 @@ describe('usePimsUi', () => {
     const { result } = renderHook(() => usePimsUi({ allowed: false }))
     act(() => result.current.setLook('glass'))
     expect(result.current.active).toBe(false)
+  })
+})
+
+// Open item 1 (PR #2): unmounting one consumer must not strip glass from the page while another is mounted.
+describe('several consumers', () => {
+  it('mount two hooks, unmount one: data-pims-ui stays; unmount the last: it clears', () => {
+    const a = renderHook(() => usePimsUi({ allowed: true }))
+    const b = renderHook(() => usePimsUi({ allowed: true }))
+    expect(root.getAttribute('data-pims-ui')).toBe('glass')
+    a.unmount()
+    expect(root.getAttribute('data-pims-ui')).toBe('glass')
+    expect(root.getAttribute('data-pims-theme')).toBe('light')
+    b.unmount()
+    expect(root.hasAttribute('data-pims-ui')).toBe(false)
+    expect(root.hasAttribute('data-pims-theme')).toBe(false)
+  })
+  it('StrictMode (effects run twice) still ends with glass on, and off after unmount', () => {
+    const { unmount } = renderHook(() => usePimsUi({ allowed: true }), { wrapper: StrictMode })
+    expect(root.getAttribute('data-pims-ui')).toBe('glass')
+    unmount()
+    expect(root.hasAttribute('data-pims-ui')).toBe(false)
+  })
+  it('the order of unmounting does not matter', () => {
+    const a = renderHook(() => usePimsUi({ allowed: true }))
+    const b = renderHook(() => usePimsUi({ allowed: true }))
+    b.unmount()
+    expect(root.getAttribute('data-pims-ui')).toBe('glass')
+    a.unmount()
+    expect(root.hasAttribute('data-pims-ui')).toBe(false)
+  })
+  it('a not-allowed consumer unmounting does not touch an allowed one, and a theme change survives the other unmounting', () => {
+    const a = renderHook(() => usePimsUi({ allowed: true }))
+    const staff = renderHook(() => usePimsUi({ allowed: false }))
+    act(() => a.result.current.setTheme('dark'))
+    expect(root.getAttribute('data-pims-theme')).toBe('dark')
+    staff.unmount()
+    expect(root.getAttribute('data-pims-ui')).toBe('glass')
+    expect(root.getAttribute('data-pims-theme')).toBe('dark')
+    a.unmount()
+    expect(root.hasAttribute('data-pims-ui')).toBe(false)
+  })
+  it('two instances stay in step through pims:ui (look and theme)', () => {
+    const a = renderHook(() => usePimsUi({ allowed: true }))
+    const b = renderHook(() => usePimsUi({ allowed: true }))
+    act(() => a.result.current.setLook('classic'))
+    expect(b.result.current.look).toBe('classic')
+    expect(root.hasAttribute('data-pims-ui')).toBe(false)
+    act(() => b.result.current.setLook('glass'))
+    act(() => b.result.current.setTheme('dark'))
+    expect(a.result.current.look).toBe('glass')
+    expect(a.result.current.theme).toBe('dark')
+    expect(root.getAttribute('data-pims-theme')).toBe('dark')
+  })
+  it('a storage event with key === null (another tab cleared storage) re-reads both keys', () => {
+    localStorage.setItem('pims.ui.look', 'classic')
+    localStorage.setItem('pims.ui.theme', 'dark')
+    const { result } = renderHook(() => usePimsUi({ allowed: true }))
+    expect(result.current.look).toBe('classic')
+    act(() => {
+      localStorage.clear()
+      window.dispatchEvent(new StorageEvent('storage', { key: null }))
+    })
+    expect(result.current.look).toBe('glass')
+    expect(result.current.theme).toBe('system')
+    expect(root.getAttribute('data-pims-ui')).toBe('glass')
+  })
+  it('a storage event for an unrelated key is ignored', () => {
+    localStorage.setItem('pims.ui.look', 'classic')
+    const { result } = renderHook(() => usePimsUi({ allowed: true }))
+    act(() => {
+      localStorage.setItem('pims.ui.look', 'glass')
+      window.dispatchEvent(new StorageEvent('storage', { key: 'something.else' }))
+    })
+    expect(result.current.look).toBe('classic')
+  })
+})
+
+describe('PimsLookMenu with the real hook', () => {
+  function Harness() {
+    const ui = usePimsUi({ allowed: true })
+    return <PimsLookMenu ui={ui} />
+  }
+  it('clicking Classic / Soft glass / Dark switches the page and moves aria-pressed', () => {
+    render(<Harness />)
+    const btn = (name) => screen.getByRole('button', { name })
+    expect(btn('Soft glass (new)').getAttribute('aria-pressed')).toBe('true')
+    expect(btn('Classic').getAttribute('aria-pressed')).toBe('false')
+    act(() => btn('Classic').click())
+    expect(root.hasAttribute('data-pims-ui')).toBe(false)
+    expect(btn('Classic').getAttribute('aria-pressed')).toBe('true')
+    expect(screen.queryByRole('button', { name: 'Dark' })).toBeNull()
+    act(() => btn('Soft glass (new)').click())
+    expect(root.getAttribute('data-pims-ui')).toBe('glass')
+    act(() => btn('Dark').click())
+    expect(root.getAttribute('data-pims-theme')).toBe('dark')
+    expect(btn('Dark').getAttribute('aria-pressed')).toBe('true')
+    expect(btn('System').getAttribute('aria-pressed')).toBe('false')
+    expect(screen.getByRole('group', { name: 'Theme' })).toBeTruthy()
   })
 })
 
